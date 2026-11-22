@@ -1,0 +1,107 @@
+{
+  "findings": [],
+  "controls": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/safedock/config/SafeSecurity.kt",
+      "line": 19,
+      "reason": "Публичный health без более строгого правила ниже."
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/safedock/config/SafeSecurity.kt",
+      "line": 20,
+      "reason": "Публичные курсы без owner-колонок и без затеняющего правила."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/safedock/config/SafeCors.kt",
+      "line": 17,
+      "endLine": 19,
+      "reason": "credentials с конкретным origin."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/safedock/config/SafeCors.kt",
+      "line": 22,
+      "endLine": 23,
+      "reason": "\"*\" без credentials."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/safedock/config/SafeCors.kt",
+      "line": 26,
+      "endLine": 27,
+      "reason": "\"*\" с явным allowCredentials = false."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/safedock/config/SafeCors.kt",
+      "line": 38,
+      "reason": "@CrossOrigin с конкретным origin."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/ru/safedock/net/SafeClients.kt",
+      "line": 11,
+      "endLine": 12,
+      "reason": "Обычный HttpsURLConnection."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/ru/safedock/net/SafeClients.kt",
+      "line": 14,
+      "endLine": 17,
+      "reason": "OkHttpClient без замены верификатора."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/ru/safedock/net/SafeClients.kt",
+      "line": 21,
+      "endLine": 22,
+      "reason": "Верификатор сравнивает имя хоста и вызывает штатный."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteController.kt",
+      "line": 21,
+      "endLine": 22,
+      "reason": "Principal и фильтр по owner_id."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteController.kt",
+      "line": 25,
+      "endLine": 27,
+      "reason": "Именованные параметры; шаблон \"%$title%\" только в значении параметра."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteController.kt",
+      "line": 32,
+      "endLine": 33,
+      "reason": "Запрос с ?."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteController.kt",
+      "line": 42,
+      "endLine": 43,
+      "reason": "Параметр типа Int."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteService.kt",
+      "line": 9,
+      "endLine": 10,
+      "reason": "@PostAuthorize(\"returnObject.ownerId == authentication.name\")."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/safedock/notes/NoteEntity.kt",
+      "line": 25,
+      "endLine": 26,
+      "reason": "JPA Specification."
+    }
+  ]
+}

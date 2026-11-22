@@ -1,0 +1,73 @@
+{
+  "findings": [
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/SettlementClient.kt",
+      "line": 11
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/OkHttpFactory.kt",
+      "line": 13
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/TrustAllContext.kt",
+      "line": 11,
+      "endLine": 13
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/ApacheClientFactory.kt",
+      "line": 15
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/ApacheClientFactory.kt",
+      "line": 25
+    }
+  ],
+  "controls": [
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/SettlementClient.kt",
+      "line": 18,
+      "endLine": 20,
+      "reason": "Обычный HttpsURLConnection без замены верификатора."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/OkHttpFactory.kt",
+      "line": 17,
+      "endLine": 20,
+      "reason": "OkHttpClient без замены hostnameVerifier."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/ApacheClientFactory.kt",
+      "line": 19,
+      "endLine": 22,
+      "reason": "Apache HttpClient со штатной проверкой имени хоста."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/PinnedClients.kt",
+      "line": 16,
+      "reason": "Верификатор реально сравнивает hostname с ожидаемым."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/PinnedClients.kt",
+      "line": 22,
+      "endLine": 23,
+      "reason": "Верификатор проверяет суффикс и делегирует штатному верификатору."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/io/paygate/client/PinnedClients.kt",
+      "line": 39,
+      "endLine": 40,
+      "reason": "X509TrustManager делегирует проверку цепочки штатному менеджеру."
+    }
+  ]
+}

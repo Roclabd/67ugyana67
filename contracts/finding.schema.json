@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/finding.schema.json",
+  "title": "Внутренний формат находок и отчёта запуска анализаторов",
+  "description": "Версия 1. Внутренний отчёт. ReportExporter формирует отдельный JSON авторов набора по contracts/report-format.md. Изменения — через LOCK у C.",
+  "$defs": {
+    "category": { "enum": ["SECRET", "SAST", "SCA"] },
+    "severity": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "secretClass": { "enum": ["password", "api-key", "configuration-token", "secret-fallback", "recoverable-token"] },
+    "sastClass": { "enum": ["sql-injection", "tls-verification", "credentialed-cors", "route-authorization", "object-authorization"] },
+    "nonBlank": { "type": "string", "pattern": "\\S" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}(?![\\s\\S])" },
+    "relPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\\\u0000-\\u001F]+(?![\\s\\S])",
+      "allOf": [{ "$ref": "#/$defs/nonBlank" }],
+      "description": "Путь относительно корня проверяемого проекта, разделитель /, точный регистр, без .. и абсолютных путей."
+    },
+    "location": {
+      "type": "object",
+      "required": ["path", "line"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "$ref": "#/$defs/relPath" },
+        "line": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1, "description": "Включительно, не меньше line. Сравнение границ выполняет код." },
+        "note": { "type": "string", "description": "Почему это место важно: источник, преобразование, сток, правило безопасности. Без значений секретов." }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "fingerprint", "category", "path", "severity", "rule", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/nonBlank", "description": "Уникален в пределах запуска. Валидатор AI ссылается на этот идентификатор." },
+        "fingerprint": { "$ref": "#/$defs/sha256", "description": "Шестнадцатеричный SHA-256. Состав входа определён в contracts/report-format.md." },
+        "category": { "$ref": "#/$defs/category" },
+        "class": { "$ref": "#/$defs/nonBlank", "description": "Для SECRET/SAST — код из secretClass/sastClass; свой код допустим для новых типов." },
+        "path": { "$ref": "#/$defs/relPath" },
+        "line": { "type": "integer", "minimum": 1 },
+        "endLine": { "type": "integer", "minimum": 1, "description": "Включительно. Код проверяет line <= endLine <= line + 14." },
+        "severity": { "$ref": "#/$defs/severity" },
+        "rule": { "$ref": "#/$defs/nonBlank", "description": "Идентификатор нашего правила, например sast.route.shadowed-permit-all" },
+        "title": { "type": "string" },
+        "description": { "type": "string", "description": "Что обнаружено и к чему ведёт. Для SECRET — без значения секрета." },
+        "remediation": { "type": "string" },
+        "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/location" }, "description": "Цепочка мест, по которым правило пришло к выводу, без исходных значений секретов." },
+        "secretMasked": { "$ref": "#/$defs/nonBlank", "description": "Только для SECRET: маска. Сырое значение не хранится." },
+        "secretHash": { "$ref": "#/$defs/sha256", "description": "Только для SECRET: внутренний SHA-256 значения. Исключается из внешних представлений отчёта." },
+        "group": { "$ref": "#/$defs/nonBlank" },
+        "artifact": { "$ref": "#/$defs/nonBlank" },
+        "version": { "$ref": "#/$defs/nonBlank", "description": "Точно как в проекте; из gradle.lockfile, если есть." },
+        "advisoryId": { "$ref": "#/$defs/nonBlank", "description": "ID записи справочника, CVE из aliases или локальный POLICY-ID для пользовательского правила SCA." },
+        "fixedVersions": { "type": "array", "items": { "type": "string" }, "description": "Из справочника; основа детерминированной рекомендации SCA." },
+        "ai": {
+          "type": "object",
+          "description": "Заполняет LLM-нода только после валидатора.",
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["OK", "NOT_RECEIVED", "REJECTED_BY_VALIDATOR"] },
+            "explanation": { "type": "string" },
+            "impact": { "type": "string" },
+            "fixSteps": { "type": "array", "items": { "type": "string" } },
+            "fixExample": { "type": "string" },
+            "usefulnessChecks": { "type": "object", "additionalProperties": { "type": "boolean" } }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "category": { "const": "SCA" } } },
+          "then": { "required": ["group", "artifact", "version", "advisoryId"] },
+          "else": {
+            "required": ["class", "line"],
+            "properties": { "group": false, "artifact": false, "version": false, "advisoryId": false, "fixedVersions": false }
+          }
+        },
+        {
+          "if": { "properties": { "category": { "const": "SECRET" } } },
+          "else": { "properties": { "secretMasked": false, "secretHash": false } }
+        },
+        {
+          "if": { "required": ["endLine"] },
+          "then": { "required": ["line"] }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["status", "filesAnalyzed", "filesSkipped", "rulesApplied", "unresolved", "dismissed"],
+      "properties": {
+        "status": { "enum": ["COMPLETE", "PARTIAL", "FAILED"] },
+        "filesAnalyzed": { "type": "integer", "minimum": 0 },
+        "advisoryCount": { "type": "integer", "minimum": 0, "description": "Число записей SCA после объединения справочников." },
+        "dependencyCoverage": {
+          "type": "object",
+          "description": "Объявленные Gradle-зависимости по результату сверки со справочниками SCA.",
+          "required": ["checked", "withoutAdvisories", "unresolvedVersion"],
+          "properties": {
+            "checked": { "type": "integer", "minimum": 0 },
+            "withoutAdvisories": { "type": "integer", "minimum": 0 },
+            "unresolvedVersion": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "advisorySources": {
+          "type": "array",
+          "description": "Загруженные справочники SCA и число записей в каждом до объединения.",
+          "items": {
+            "type": "object",
+            "required": ["source", "path", "records"],
+            "properties": {
+              "source": { "enum": ["builtin", "project"] },
+              "path": { "$ref": "#/$defs/nonBlank" },
+              "records": { "type": "integer", "minimum": 0 },
+              "snapshotDate": { "type": "string", "format": "date", "description": "Дата снимка из справочника, когда указана." }
+            }
+          }
+        },
+        "springBootBoms": {
+          "type": "array",
+          "description": "Релизы встроенных таблиц Spring Boot BOM, использованных для определения версий, и места подключения в проекте.",
+          "items": {
+            "type": "object",
+            "required": ["release", "path", "line"],
+            "properties": {
+              "release": { "$ref": "#/$defs/nonBlank" },
+              "path": { "$ref": "#/$defs/relPath" },
+              "line": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "filesSkipped": {
+          "type": "array",
+          "items": { "type": "object", "required": ["path", "reason"], "properties": { "path": { "$ref": "#/$defs/relPath" }, "reason": { "$ref": "#/$defs/nonBlank" }, "line": { "type": "integer", "minimum": 1 } } }
+        },
+        "rulesApplied": { "type": "array", "items": { "type": "string" } },
+        "rules": {
+          "type": "array",
+          "description": "Названия и описания применённых правил из rulesApplied.",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "description"],
+            "properties": {
+              "id": { "$ref": "#/$defs/nonBlank" },
+              "title": { "$ref": "#/$defs/nonBlank" },
+              "description": { "$ref": "#/$defs/nonBlank" }
+            }
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "description": "Что не удалось установить: версия зависимости, поток в неизвестный вызов, неразобранная конструкция.",
+          "items": { "type": "object", "required": ["kind", "path", "reason"], "properties": { "kind": { "$ref": "#/$defs/nonBlank" }, "path": { "$ref": "#/$defs/relPath" }, "line": { "type": "integer", "minimum": 1 }, "reason": { "$ref": "#/$defs/nonBlank" }, "subject": { "type": "string" } } }
+        },
+        "dismissed": {
+          "type": "array",
+          "description": "Проверенные и отклонённые безопасные места с причиной (плейсхолдер, ${ENV}, параметризованный запрос, версия вне диапазона).",
+          "items": { "type": "object", "required": ["rule", "path", "reason"], "properties": { "rule": { "$ref": "#/$defs/nonBlank" }, "path": { "$ref": "#/$defs/relPath" }, "line": { "type": "integer", "minimum": 1 }, "reason": { "$ref": "#/$defs/nonBlank" } } }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["runId", "inputHash", "rulesVersion", "coverage", "findings"],
+  "dependentRequired": {
+    "workflowId": ["workflowVersion"],
+    "workflowVersion": ["workflowId"]
+  },
+  "properties": {
+    "runId": { "$ref": "#/$defs/nonBlank" },
+    "workflowId": { "$ref": "#/$defs/nonBlank" },
+    "workflowVersion": { "type": "integer" },
+    "inputHash": { "type": "string", "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})(?![\\s\\S])", "description": "Полный SHA точного коммита или SHA-256 снимка содержимого проекта в нижнем регистре." },
+    "rulesVersion": { "$ref": "#/$defs/nonBlank", "description": "Версия набора правил и снимка справочника SCA для этого запуска." },
+    "sourceSubdir": { "$ref": "#/$defs/relPath", "description": "Подпапка проекта относительно корня Git-репозитория, если она была выбрана при запуске." },
+    "languages": {
+      "type": "array",
+      "description": "Языки проекта: число файлов и что из этого анализировалось.",
+      "items": { "type": "object", "required": ["name", "files"], "properties": { "name": { "type": "string" }, "files": { "type": "integer", "minimum": 0 }, "secret": { "type": "boolean" }, "sca": { "type": "boolean" }, "sast": { "type": "boolean" }, "note": { "type": "string" } } }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "Покрытие по узлам анализаторов. Агрегация, включая отсутствующую проверку, описана в contracts/report-format.md.",
+      "required": ["status", "byAnalyzer"],
+      "properties": {
+        "status": { "enum": ["COMPLETE", "PARTIAL", "FAILED"] },
+        "byAnalyzer": { "type": "object", "description": "Ключ — идентификатор ноды в графе запуска.", "additionalProperties": { "$ref": "#/$defs/coverage" } }
+      },
+      "if": { "properties": { "status": { "const": "COMPLETE" } } },
+      "then": {
+        "properties": { "byAnalyzer": { "minProperties": 1 } }
+      }
+    },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "ai": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["OK", "PARTIAL", "NOT_RECEIVED"] },
+        "provider": { "type": "string" },
+        "model": { "type": "string" },
+        "summary": { "type": "string" },
+        "validator": {
+          "type": "object",
+          "properties": {
+            "responses": { "type": "integer" },
+            "schemaFailures": { "type": "integer" },
+            "rejectedFindingRefs": { "type": "integer" },
+            "rejectedCves": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}

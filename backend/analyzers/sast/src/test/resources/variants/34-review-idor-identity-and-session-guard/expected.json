@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/repair/TicketController.kt", "line": 38, "endLine": 40}
+  ],
+  "controls": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/repair/TicketController.kt", "line": 46, "endLine": 50, "reason": "После загрузки строки require сверяет customer_id с authentication.name из серверного SPRING_SECURITY_CONTEXT в HttpSession. Чужая запись не возвращается."}
+  ]
+}

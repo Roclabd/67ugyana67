@@ -1,0 +1,88 @@
+{
+  "cases": [
+    {
+      "id": "kotlin-incomplete-expression",
+      "language": "kotlin",
+      "defectType": "syntax",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "Demo.kt:1:41: error: syntax error: Expecting an element.\nfun nextValue(value: Int): Int = value +\n                                        ^"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    },
+    {
+      "id": "kotlin-missing-delimiter",
+      "language": "kotlin",
+      "defectType": "syntax",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "Demo.kt:1:39: error: syntax error: Expecting ')'.\nfun samples(): List<Int> = listOf(1, 2\n                                      ^"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    },
+    {
+      "id": "kotlin-incompatible-return",
+      "language": "kotlin",
+      "defectType": "type",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "Demo.kt:1:21: error: return type mismatch: expected 'Int', actual 'String'.\nfun result(): Int = \"hello\"\n                    ^^^^^^^"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    },
+    {
+      "id": "kotlin-unknown-variable",
+      "language": "kotlin",
+      "defectType": "unresolved-reference",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "Demo.kt:1:31: error: unresolved reference 'vlaue'.\nfun result(value: Int): Int = vlaue + 1\n                              ^^^^^"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    },
+    {
+      "id": "python-missing-colon",
+      "language": "python",
+      "defectType": "syntax",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "expected ':'"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    },
+    {
+      "id": "javascript-missing-brace",
+      "language": "javascript",
+      "defectType": "syntax",
+      "buggy": {
+        "compiled": false,
+        "diagnostic": "\\Demo.js:2\n\n\n\nSyntaxError: Unexpected end of input\n    at wrapSafe (node:internal/modules/cjs/loader:1861:18)\n    at checkSyntax (node:internal/main/check_syntax:88:3)\n\nNode.js v24.22.3"
+      },
+      "fixed": {
+        "compiled": true,
+        "diagnostic": ""
+      },
+      "verified": true
+    }
+  ]
+}

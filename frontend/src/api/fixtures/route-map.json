@@ -1,0 +1,191 @@
+{
+  "kind": "route-map",
+  "status": "COMPLETE",
+  "routes": [
+    {
+      "function": "lab.servicedesk.catalog.ServiceCatalogController.serviceNames",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/catalog/services",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/catalog/ServiceCatalogController.kt",
+        "line": 8
+      },
+      "rule": {
+        "access": "permitAll",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 17
+      },
+      "subsequentRules": [
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [],
+      "tableEvidence": "unresolved"
+    },
+    {
+      "function": "lab.servicedesk.repair.RepairLookupController.findByTicketCode",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/customer/search/code",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+        "line": 16
+      },
+      "rule": {
+        "access": "authenticated",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 20
+      },
+      "subsequentRules": [
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [
+        {
+          "name": "repair_ticket",
+          "ownerColumns": [
+            "customer_id"
+          ],
+          "schemaKnown": true
+        }
+      ],
+      "tableEvidence": "located"
+    },
+    {
+      "function": "lab.servicedesk.repair.RepairLookupController.findByFrameTag",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/customer/search/frame",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+        "line": 12
+      },
+      "rule": {
+        "access": "authenticated",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 20
+      },
+      "subsequentRules": [
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [
+        {
+          "name": "repair_ticket",
+          "ownerColumns": [
+            "customer_id"
+          ],
+          "schemaKnown": true
+        }
+      ],
+      "tableEvidence": "located"
+    },
+    {
+      "function": "lab.servicedesk.repair.RepairTicketController.summary",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/customer/summary",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/repair/RepairTicketController.kt",
+        "line": 17
+      },
+      "rule": {
+        "access": "authenticated",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 20
+      },
+      "subsequentRules": [
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [],
+      "tableEvidence": "unresolved"
+    },
+    {
+      "function": "lab.servicedesk.repair.RepairTicketController.getTicket",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/customer/tickets/{ticketId}",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/repair/RepairTicketController.kt",
+        "line": 13
+      },
+      "rule": {
+        "access": "authenticated",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 20
+      },
+      "subsequentRules": [
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [],
+      "tableEvidence": "unresolved"
+    },
+    {
+      "function": "lab.servicedesk.pickup.PickupExportController.export",
+      "accessStatus": "matched",
+      "method": "GET",
+      "path": "/api/pickup/export",
+      "location": {
+        "file": "src/main/kotlin/lab/servicedesk/pickup/PickupExportController.kt",
+        "line": 9
+      },
+      "rule": {
+        "access": "permitAll",
+        "matcher": "requestMatchers",
+        "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+        "line": 18
+      },
+      "subsequentRules": [
+        {
+          "access": "hasRole",
+          "matcher": "requestMatchers",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 19
+        },
+        {
+          "access": "denyAll",
+          "matcher": "anyRequest",
+          "file": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 21
+        }
+      ],
+      "methodGuards": [],
+      "tables": [],
+      "tableEvidence": "unresolved"
+    }
+  ],
+  "markdown": "# Карта маршрутов\n\nПокрытие модели: COMPLETE.\nДоступ отражает декларации Spring. Для неразрешённых правил требуется проверка.\n\n| Метод | Маршрут | Первое правило | Последующие правила | Таблицы и колонки владельцев |\n| --- | --- | --- | --- | --- |\n| GET | /api/catalog/services | permitAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:17) | denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | не установлено | \n| GET | /api/customer/search/code | authenticated (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:20) | denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | repair\\_ticket (customer\\_id) | \n| GET | /api/customer/search/frame | authenticated (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:20) | denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | repair\\_ticket (customer\\_id) | \n| GET | /api/customer/summary | authenticated (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:20) | denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | не установлено | \n| GET | /api/customer/tickets/{ticketId} | authenticated (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:20) | denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | не установлено | \n| GET | /api/pickup/export | permitAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:18) | hasRole (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:19), denyAll (src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt:21) | не установлено | \n"
+}

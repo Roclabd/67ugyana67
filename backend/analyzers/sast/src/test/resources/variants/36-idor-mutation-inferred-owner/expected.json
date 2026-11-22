@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/slots/SlotApi.kt", "line": 45, "endLine": 47}
+  ],
+  "controls": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/slots/SlotApi.kt", "line": 51, "endLine": 53, "reason": "UPDATE ограничен колонкой curator_id, значение берётся из principal.name."}
+  ]
+}

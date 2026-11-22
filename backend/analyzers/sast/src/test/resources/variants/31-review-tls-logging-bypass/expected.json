@@ -1,0 +1,9 @@
+{
+  "findings": [
+    {"class": "tls-verification", "path": "src/main/kotlin/lab/variants/integration/SupplierClients.kt", "line": 15},
+    {"class": "tls-verification", "path": "src/main/kotlin/lab/variants/integration/SupplierClients.kt", "line": 25}
+  ],
+  "controls": [
+    {"class": "tls-verification", "path": "src/main/kotlin/lab/variants/integration/SupplierClients.kt", "line": 36, "reason": "HostnameVerifier делегирует штатной проверке имени; SSLContext и проверка цепочки не изменены."}
+  ]
+}

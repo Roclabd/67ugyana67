@@ -1,0 +1,66 @@
+name: Codeguard check
+on: [push, pull_request]
+permissions: {}
+
+jobs:
+  codeguard-check:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    env:
+      WORKFLOW_ID: WORKFLOW_ID_HERE
+      WORKFLOW_URL: ${{ vars.WORKFLOW_URL }}
+      CI_RULES_VERSION: ${{ vars.CI_RULES_VERSION || 'codeguard-rules-v2+sast-1' }}
+      REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      BRANCH: ${{ github.head_ref || github.ref_name }}
+    steps:
+      - name: Проверка кода
+        id: gate
+        env:
+          CI_TOKEN: ${{ secrets.CI_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body=$(jq -n --arg url "https://github.com/$REPOSITORY" --arg sha "$COMMIT_SHA" --arg branch "$BRANCH" --arg rules "$CI_RULES_VERSION" \
+            '{repoUrl:$url,commitSha:$sha,branch:$branch,rulesVersion:$rules}')
+          response=$(curl --fail-with-body --silent --show-error --max-time 140 \
+            --header "Authorization: Bearer $CI_TOKEN" --header "Content-Type: application/json" \
+            --data "$body" "${WORKFLOW_URL%/}/api/ci/workflows/$WORKFLOW_ID/run?wait=true")
+          jq '{runId,status,coverageStatus,pass,reason,missingAnalyzers}' <<<"$response"
+          if jq -e '.coverageStatus == "COMPLETE" and (.reason == "PASS" or .reason == "CRITICAL_FINDINGS")' <<<"$response" >/dev/null; then
+            run_id=$(jq -er '.runId | select(type == "string" and test("^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$"))' <<<"$response")
+            printf 'report_run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
+          fi
+          jq -e '.pass == true' <<<"$response" > /dev/null
+      - name: Забрать снимок для Code Scanning
+        id: source
+        if: ${{ always() && !cancelled() && steps.gate.outputs.report_run_id != '' && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.COMMIT_SHA }}
+          persist-credentials: false
+      - name: Скачать SARIF
+        id: sarif
+        if: ${{ always() && !cancelled() && steps.source.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          RUN_ID: ${{ steps.gate.outputs.report_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error --max-time 20 \
+            --output report.sarif "${WORKFLOW_URL%/}/api/runs/$RUN_ID/report.sarif"
+          jq -e '.version == "2.1.0" and (.runs | type == "array")' report.sarif >/dev/null
+      - name: Выгрузить SARIF в GitHub Code Scanning
+        if: ${{ always() && !cancelled() && steps.sarif.outcome == 'success' }}
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: report.sarif
+          category: codeguard
+          ref: ${{ github.event_name == 'pull_request' && format('refs/pull/{0}/head', github.event.number) || github.ref }}
+          sha: ${{ env.COMMIT_SHA }}

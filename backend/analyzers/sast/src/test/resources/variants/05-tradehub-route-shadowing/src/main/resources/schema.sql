@@ -1,0 +1,8 @@
+CREATE TABLE product (
+    sku VARCHAR(24) PRIMARY KEY,
+    title VARCHAR(120) NOT NULL,
+    price DECIMAL(12, 2) NOT NULL,
+    cost DECIMAL(12, 2) NOT NULL,
+    stock INT NOT NULL,
+    published BOOLEAN NOT NULL DEFAULT TRUE
+);

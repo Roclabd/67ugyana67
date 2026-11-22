@@ -1,0 +1,27 @@
+# docker compose up --build  ->  http://127.0.0.1:8080
+# Секреты и LLM/Telegram - необязательно: cp .env.example .env и заполнить (без .env тоже запустится).
+services:
+  codeguard:
+    build: .
+    image: codeguard
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_BIND_ADDRESS: 0.0.0.0
+      APP_DATA_DIR: /app/data
+      PORT: "8080"
+    ports:
+      - "127.0.0.1:${PORT:-8080}:8080"
+    volumes:
+      - codeguard-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/api/nodes", "-o", "/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  codeguard-data:

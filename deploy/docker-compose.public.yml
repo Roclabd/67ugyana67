@@ -1,0 +1,71 @@
+# Публичное демо за HTTPS. Запускать из корня репозитория:
+#   docker compose --env-file .env -f deploy/docker-compose.public.yml up -d --build
+# Подробности: deploy/README.md
+services:
+  app:
+    build:
+      context: ..
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      APP_PUBLIC_DEMO: "true"
+      APP_BIND_ADDRESS: 0.0.0.0
+      APP_DATA_DIR: /app/data
+      PORT: "8080"
+      # Домен для Host-проверки; localhost и 127.0.0.1 нужны для healthcheck внутри контейнера.
+      APP_ALLOWED_HOSTS: ${DOMAIN:?Задайте DOMAIN в .env},localhost,127.0.0.1
+      APP_PUBLIC_URL: https://${DOMAIN}
+      # Доверяем X-Forwarded-For только от прокси Caddy (фиксированный адрес в сети ниже).
+      APP_TRUSTED_PROXY: 172.28.0.10
+      APP_PUBLIC_DEMO_REPOS: ${APP_PUBLIC_DEMO_REPOS:-https://github.com/example-org/training}
+      APP_PUBLIC_DEMO_AI: ${APP_PUBLIC_DEMO_AI:-true}
+      TELEGRAM_BOT_COMMANDS: "false"
+      JAVA_TOOL_OPTIONS: "-Xmx1g -XX:+ExitOnOutOfMemoryError"
+    # Порты наружу не публикуются: доступ только через Caddy.
+    expose:
+      - "8080"
+    volumes:
+      - demo-data:/app/data
+    mem_limit: 1536m
+    restart: unless-stopped
+    networks:
+      - demo
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/api/meta", "-o", "/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  caddy:
+    image: caddy:2
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?Задайте DOMAIN в .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    mem_limit: 256m
+    restart: unless-stopped
+    networks:
+      demo:
+        ipv4_address: 172.28.0.10
+
+networks:
+  demo:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  demo-data:
+  caddy-data:
+  caddy-config:

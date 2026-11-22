@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "route-authorization", "path": "src/main/kotlin/lab/variants/config/ExportSecurity.kt", "line": 21}
+  ],
+  "controls": [
+    {"class": "route-authorization", "path": "src/main/kotlin/lab/variants/config/ExportSecurity.kt", "line": 20, "reason": "Включён @EnableMethodSecurity; export защищён @PreAuthorize(hasRole('MECHANIC')), поэтому permitAll на HTTP-уровне не открывает выгрузку анониму или клиенту."}
+  ]
+}

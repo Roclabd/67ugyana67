@@ -1,0 +1,49 @@
+{
+  "findings": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/cashbox/portal/security/PortalSecurity.kt",
+      "line": 19
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/cashbox/portal/accounts/AccountController.kt",
+      "line": 22,
+      "endLine": 23
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/ru/cashbox/portal/client/RatesClient.kt",
+      "line": 15,
+      "endLine": 17
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/cashbox/portal/transfers/TransferRepository.kt",
+      "line": 8,
+      "endLine": 9
+    }
+  ],
+  "controls": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/cashbox/portal/security/PortalSecurity.kt",
+      "line": 18,
+      "reason": "Публичный логин, строгого правила для /api/auth/** ниже нет."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/cashbox/portal/statements/StatementService.kt",
+      "line": 11,
+      "endLine": 13,
+      "reason": "Токен из Authorization сверяется с owner_id, иначе IsNotOwnerException."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/cashbox/portal/transfers/TransferRepository.kt",
+      "line": 11,
+      "endLine": 12,
+      "reason": "Параметр типа Long."
+    }
+  ]
+}

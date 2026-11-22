@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "credentialed-cors", "path": "src/main/kotlin/lab/variants/config/CustomerCors.kt", "line": 21, "endLine": 22}
+  ],
+  "controls": [
+    {"class": "credentialed-cors", "path": "src/main/kotlin/lab/variants/config/CustomerCors.kt", "line": 26, "endLine": 27, "reason": "До регистрации wildcard перезаписан единственным доверенным origin https://portal.example.test на строке 28; наружу выходит уже ограниченная конфигурация."}
+  ]
+}

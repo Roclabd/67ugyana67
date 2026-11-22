@@ -1,0 +1,69 @@
+{
+  "findings": [
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/PartnerCors.kt",
+      "line": 15,
+      "endLine": 17
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/PartnerCors.kt",
+      "line": 39,
+      "endLine": 41
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/MvcCorsConfig.kt",
+      "line": 11,
+      "endLine": 13
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/AnnotatedControllers.kt",
+      "line": 9
+    }
+  ],
+  "controls": [
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/PartnerCors.kt",
+      "line": 20,
+      "endLine": 22,
+      "reason": "\"*\" без credentials (явный false)."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/PartnerCors.kt",
+      "line": 25,
+      "endLine": 27,
+      "reason": "credentials с конкретным origin."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/MvcCorsConfig.kt",
+      "line": 16,
+      "endLine": 17,
+      "reason": "\"*\" без credentials в WebMvcConfigurer."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/MvcCorsConfig.kt",
+      "line": 20,
+      "endLine": 22,
+      "reason": "credentials с конкретным origin в WebMvcConfigurer."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/AnnotatedControllers.kt",
+      "line": 13,
+      "reason": "@CrossOrigin с credentials и конкретным origin."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/shopwindow/web/AnnotatedControllers.kt",
+      "line": 17,
+      "reason": "@CrossOrigin \"*\" без credentials."
+    }
+  ]
+}

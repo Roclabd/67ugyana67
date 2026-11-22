@@ -1,0 +1,103 @@
+# CI репозитория.
+# Шаги сборки включаются сами, когда появляются соответствующие файлы
+# (backend: settings.gradle.kts в корне; frontend: frontend/package.json).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixtures-intact:
+    name: Учебный набор не изменён
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: fixtures/training меняется только вместе с .source-commit
+        if: github.event_name == 'pull_request'
+        run: |
+          changed="$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- fixtures/training)"
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -q '^fixtures/training/.source-commit$'; then
+            echo "fixtures/training — копия набора авторов набора, правки запрещены:"; echo "$changed"; exit 1
+          fi
+
+  backend:
+    name: Бэкенд — сборка и тесты
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          if [ -f settings.gradle.kts ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - if: steps.detect.outputs.present == 'true'
+        uses: gradle/actions/setup-gradle@v4
+      - if: steps.detect.outputs.present == 'true'
+        run: ./gradlew --no-daemon build
+      - if: steps.detect.outputs.present != 'true'
+        run: echo "Бэкенда ещё нет — пропуск."
+
+  jar-smoke:
+    name: Смоук JAR — прямые ссылки и API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          if [ -f settings.gradle.kts ] && [ -f frontend/package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - if: steps.detect.outputs.present == 'true'
+        uses: gradle/actions/setup-gradle@v4
+      - if: steps.detect.outputs.present == 'true'
+        run: |
+          (cd frontend && npm ci && npm run build)
+          ./gradlew --no-daemon :backend:app:bootJar
+          bash scripts/smoke-jar.sh "$(ls backend/app/build/libs/*.jar | grep -v plain | head -1)"
+      - if: steps.detect.outputs.present != 'true'
+        run: echo "Бэкенда или фронтенда ещё нет — пропуск."
+
+  frontend:
+    name: Фронтенд — типы, линтер, сборка
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          if [ -f frontend/package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - if: steps.detect.outputs.present == 'true'
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run build
+      - if: steps.detect.outputs.present != 'true'
+        run: echo "Фронтенда ещё нет — пропуск."

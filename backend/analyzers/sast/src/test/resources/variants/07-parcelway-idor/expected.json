@@ -1,0 +1,52 @@
+{
+  "findings": [
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/orders/OrderReader.kt",
+      "line": 10,
+      "endLine": 11
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/parcels/ParcelService.kt",
+      "line": 10,
+      "endLine": 11
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/receipts/ReceiptController.kt",
+      "line": 19,
+      "endLine": 20
+    }
+  ],
+  "controls": [
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/orders/OrderReader.kt",
+      "line": 16,
+      "endLine": 17,
+      "reason": "WHERE order_id = ? AND customer_id = ?, владелец из Principal."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/orders/OrderController.kt",
+      "line": 18,
+      "endLine": 19,
+      "reason": "Эндпоинт принимает Principal и передаёт владельца в запрос."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/parcels/ParcelService.kt",
+      "line": 14,
+      "endLine": 15,
+      "reason": "@PostAuthorize(\"returnObject.ownerId == authentication.name\")."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/parcelway/receipts/ReceiptController.kt",
+      "line": 23,
+      "endLine": 24,
+      "reason": "@AuthenticationPrincipal и WHERE id = ? AND user_id = ?."
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "kotlin-rating-average",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "integer-division",
+      "description": "The average of a nonempty list of whole-number ratings retains its fractional part.",
+      "buggy": "fun ratingAverage(ratings: List<Int>): Double = (ratings.sumOf { it.toLong() } / ratings.size).toDouble()\n",
+      "fixed": "fun ratingAverage(ratings: List<Int>): Double = ratings.average()\n",
+      "assertion": "fun main() {\n    check(ratingAverage(listOf(4, 4)) == 4.0)\n    check(ratingAverage(listOf(2, 3)) == 2.5)\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-maximum-adjacent-gap",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "off-by-one",
+      "description": "The maximum gap in an ascending list includes the final adjacent pair and defaults to zero for lists with fewer than two elements.",
+      "buggy": "fun maximumAdjacentGap(values: List<Int>): Long {\n    var largest = 0L\n    for (index in 1 until values.lastIndex) {\n        largest = maxOf(largest, values[index].toLong() - values[index - 1])\n    }\n    return largest\n}\n",
+      "fixed": "fun maximumAdjacentGap(values: List<Int>): Long {\n    var largest = 0L\n    for (index in 1 until values.size) {\n        largest = maxOf(largest, values[index].toLong() - values[index - 1])\n    }\n    return largest\n}\n",
+      "assertion": "fun main() {\n    check(maximumAdjacentGap(listOf(7)) == 0L)\n    check(maximumAdjacentGap(listOf(2, 4, 11)) == 7L)\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-wrapped-cursor",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "signed-remainder",
+      "description": "In a circular list of positive size, stepping backward from position zero lands at the final index.",
+      "buggy": "fun wrappedCursor(position: Int, step: Int, size: Int): Int =\n    ((position.toLong() + step) % size).toInt()\n",
+      "fixed": "fun wrappedCursor(position: Int, step: Int, size: Int): Int =\n    Math.floorMod(position.toLong() + step, size.toLong()).toInt()\n",
+      "assertion": "fun main() {\n    check(wrappedCursor(4, 1, 5) == 0)\n    check(wrappedCursor(0, -1, 5) == 4)\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-panel-area",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "arithmetic-overflow",
+      "description": "Area in square micrometers preserves products greater than the 32-bit integer limit.",
+      "buggy": "fun panelArea(widthUm: Int, heightUm: Int): Long = (widthUm * heightUm).toLong()\n",
+      "fixed": "fun panelArea(widthUm: Int, heightUm: Int): Long = widthUm.toLong() * heightUm\n",
+      "assertion": "fun main() {\n    check(panelArea(20, 30) == 600L)\n    check(panelArea(60_000, 70_000) == 4_200_000_000L)\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-display-caption",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "blank-value-fallback",
+      "description": "Missing and whitespace-only captions both use the default label.",
+      "buggy": "fun displayCaption(value: String?): String = value ?: \"Untitled\"\n",
+      "fixed": "fun displayCaption(value: String?): String = if (value.isNullOrBlank()) \"Untitled\" else value\n",
+      "assertion": "fun main() {\n    check(displayCaption(null) == \"Untitled\")\n    check(displayCaption(\"Iris\") == \"Iris\")\n    check(displayCaption(\"   \") == \"Untitled\")\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-equal-readings",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "decimal-scale-equality",
+      "description": "Two decimal measurement readings are equal when their numeric values match, including representations with different scales.",
+      "buggy": "fun equalReadings(first: java.math.BigDecimal, second: java.math.BigDecimal): Boolean =\n    first == second\n",
+      "fixed": "fun equalReadings(first: java.math.BigDecimal, second: java.math.BigDecimal): Boolean =\n    first.compareTo(second) == 0\n",
+      "assertion": "fun main() {\n    check(!equalReadings(\"1.02\".toBigDecimal(), \"1.03\".toBigDecimal()))\n    check(equalReadings(\"1.20\".toBigDecimal(), \"1.200\".toBigDecimal()))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-next-month-end",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "calendar-boundary",
+      "description": "A monthly field report deadline is the last calendar day of the month following the supplied date.",
+      "buggy": "fun nextMonthEnd(date: java.time.LocalDate): java.time.LocalDate =\n    date.withDayOfMonth(date.lengthOfMonth()).plusDays(30)\n",
+      "fixed": "fun nextMonthEnd(date: java.time.LocalDate): java.time.LocalDate =\n    java.time.YearMonth.from(date).plusMonths(1).atEndOfMonth()\n",
+      "assertion": "fun main() {\n    check(nextMonthEnd(java.time.LocalDate.of(2024, 3, 15)) == java.time.LocalDate.of(2024, 4, 30))\n    check(nextMonthEnd(java.time.LocalDate.of(2024, 1, 15)) == java.time.LocalDate.of(2024, 2, 29))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-color-occurrences",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "duplicate-aggregation",
+      "description": "A color tally counts every occurrence in the supplied list.",
+      "buggy": "fun colorOccurrences(colors: List<String>): Map<String, Int> = colors.associateWith { 1 }\n",
+      "fixed": "fun colorOccurrences(colors: List<String>): Map<String, Int> = colors.groupingBy { it }.eachCount()\n",
+      "assertion": "fun main() {\n    check(colorOccurrences(emptyList()).isEmpty())\n    check(colorOccurrences(listOf(\"ochre\", \"plum\", \"ochre\")) == mapOf(\"ochre\" to 2, \"plum\" to 1))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-all-plants-labeled",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "quantifier-selection",
+      "description": "A collection of plants is fully labeled only when each plant has a nonblank label.",
+      "buggy": "fun allPlantsLabeled(labels: List<String>): Boolean = labels.any { it.isNotBlank() }\n",
+      "fixed": "fun allPlantsLabeled(labels: List<String>): Boolean = labels.all { it.isNotBlank() }\n",
+      "assertion": "fun main() {\n    check(allPlantsLabeled(listOf(\"fern\", \"iris\")))\n    check(!allPlantsLabeled(listOf(\"fern\", \" \")))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-label-code-points",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "unicode-code-point-counting",
+      "description": "The label length is the number of Unicode code points, including any supplementary character.",
+      "buggy": "fun labelCodePoints(label: String): Int = label.length\n",
+      "fixed": "fun labelCodePoints(label: String): Int = label.codePointCount(0, label.length)\n",
+      "assertion": "fun main() {\n    check(labelCodePoints(\"fern\") == 4)\n    check(labelCodePoints(\"A\\uD83C\\uDF31\") == 2)\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-sort-exhibits",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "sort-tie-breaking",
+      "description": "Exhibits are ordered by descending score, with names in ascending alphabetical order for ties.",
+      "buggy": "data class ScoredExhibit(val name: String, val score: Int)\n\nfun sortExhibits(exhibits: List<ScoredExhibit>): List<String> = exhibits\n    .sortedWith(compareByDescending<ScoredExhibit> { it.score }.thenByDescending { it.name })\n    .map { it.name }\n",
+      "fixed": "data class ScoredExhibit(val name: String, val score: Int)\n\nfun sortExhibits(exhibits: List<ScoredExhibit>): List<String> = exhibits\n    .sortedWith(compareByDescending<ScoredExhibit> { it.score }.thenBy { it.name })\n    .map { it.name }\n",
+      "assertion": "fun main() {\n    val exhibits = listOf(ScoredExhibit(\"Iris\", 3), ScoredExhibit(\"Aster\", 3), ScoredExhibit(\"Fern\", 1))\n    check(sortExhibits(exhibits) == listOf(\"Aster\", \"Iris\", \"Fern\"))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "kotlin-bucket-sort",
+      "language": "kotlin",
+      "extension": ".kt",
+      "category": "wrong-collection-in-loop",
+      "description": "Bucket sort outputs sorted values without changing their multiplicities. Inputs are integers from zero up to but excluding the bucket count.",
+      "source": "https://github.com/jkoppel/QuixBugs/blob/master/python_programs/bucketsort.py",
+      "buggy": "fun bucketSort(values: List<Int>, bucketCount: Int): List<Int> {\n    val frequencies = IntArray(bucketCount)\n    values.forEach { frequencies[it] += 1 }\n    return values.flatMapIndexed { bucket, frequency -> List(frequency) { bucket } }\n}\n",
+      "fixed": "fun bucketSort(values: List<Int>, bucketCount: Int): List<Int> {\n    val frequencies = IntArray(bucketCount)\n    values.forEach { frequencies[it] += 1 }\n    return frequencies.indices.flatMap { bucket -> List(frequencies[bucket]) { bucket } }\n}\n",
+      "assertion": "fun main() {\n    check(bucketSort(emptyList(), 3).isEmpty())\n    check(bucketSort(listOf(2, 0, 2, 1), 3) == listOf(0, 1, 2, 2))\n}\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "python-append-tag",
+      "language": "python",
+      "extension": ".py",
+      "category": "mutable-default-argument",
+      "description": "Calls that omit the tag list each start with an empty collection.",
+      "buggy": "def append_tag(tag, tags=[]):\n    tags.append(tag)\n    return tags\n",
+      "fixed": "def append_tag(tag, tags=None):\n    if tags is None:\n        tags = []\n    tags.append(tag)\n    return tags\n",
+      "assertion": "assert append_tag('iris') == ['iris']\nassert append_tag('fern') == ['fern']\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "python-positive-samples",
+      "language": "python",
+      "extension": ".py",
+      "category": "iterator-consumption",
+      "description": "The function returns every positive sample in input order, including when its input is a one-shot iterator.",
+      "buggy": "def positive_samples(samples):\n    if not any(value > 0 for value in samples):\n        return []\n    return [value for value in samples if value > 0]\n",
+      "fixed": "def positive_samples(samples):\n    return [value for value in samples if value > 0]\n",
+      "assertion": "assert positive_samples([-1, 0]) == []\nassert positive_samples(iter([-1, 5, 0, 8])) == [5, 8]\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "python-empty-grid",
+      "language": "python",
+      "extension": ".py",
+      "category": "shared-collection-reference",
+      "description": "Each grid row is independently mutable.",
+      "buggy": "def empty_grid(rows, columns):\n    return [[0] * columns] * rows\n",
+      "fixed": "def empty_grid(rows, columns):\n    return [[0] * columns for _ in range(rows)]\n",
+      "assertion": "grid = empty_grid(2, 2)\nassert grid == [[0, 0], [0, 0]]\ngrid[0][1] = 7\nassert grid == [[0, 7], [0, 0]]\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "javascript-garden-capacity",
+      "language": "javascript",
+      "extension": ".js",
+      "category": "falsy-value-fallback",
+      "description": "The default capacity applies to absent capacities, and an explicit capacity of zero is preserved.",
+      "buggy": "function gardenCapacity(configured) {\n    return configured || 12;\n}\n",
+      "fixed": "function gardenCapacity(configured) {\n    return configured ?? 12;\n}\n",
+      "assertion": "const assert = require('node:assert/strict');\nassert.equal(gardenCapacity(undefined), 12);\nassert.equal(gardenCapacity(null), 12);\nassert.equal(gardenCapacity(0), 0);\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "javascript-sort-temperatures",
+      "language": "javascript",
+      "extension": ".js",
+      "category": "numeric-sort-comparator",
+      "description": "Temperatures in degrees are sorted in numeric order while preserving the input array.",
+      "buggy": "function sortTemperatures(readings) {\n    return [...readings].sort();\n}\n",
+      "fixed": "function sortTemperatures(readings) {\n    return [...readings].sort((first, second) => first - second);\n}\n",
+      "assertion": "const assert = require('node:assert/strict');\nconst readings = [10, 2, -3];\nconst sorted = sortTemperatures(readings);\nassert.deepEqual(readings, [10, 2, -3]);\nassert.deepEqual(sorted, [-3, 2, 10]);\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    },
+    {
+      "id": "javascript-load-labels",
+      "language": "javascript",
+      "extension": ".js",
+      "category": "missing-promise-aggregation",
+      "description": "The function resolves to values produced by an asynchronous formatter in the order of the supplied names.",
+      "buggy": "async function loadLabels(names, format) {\n    return names.map(format);\n}\n",
+      "fixed": "async function loadLabels(names, format) {\n    return Promise.all(names.map(format));\n}\n",
+      "assertion": "const assert = require('node:assert/strict');\nasync function verify() {\n    const labels = await loadLabels(['iris', 'fern'], async (name) => name.toUpperCase());\n    assert.deepEqual(labels, ['IRIS', 'FERN']);\n}\nverify().catch((error) => {\n    console.error(error);\n    process.exitCode = 1;\n});\n",
+      "expected": { "buggy": "fail", "fixed": "pass" }
+    }
+  ]
+}

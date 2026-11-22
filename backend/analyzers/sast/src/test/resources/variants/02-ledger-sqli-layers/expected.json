@@ -1,0 +1,70 @@
+{
+  "findings": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 15,
+      "endLine": 16
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 18,
+      "endLine": 20
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 26,
+      "endLine": 27
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 31,
+      "endLine": 32
+    }
+  ],
+  "controls": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 36,
+      "endLine": 37,
+      "reason": "JPQL с :status и setParameter."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportRepository.kt",
+      "line": 41,
+      "endLine": 42,
+      "reason": "JdbcTemplate с ? и отдельным аргументом."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportSpecs.kt",
+      "line": 6,
+      "endLine": 7,
+      "reason": "JPA Specification, значение попадает в Criteria API."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportSpecs.kt",
+      "line": 9,
+      "endLine": 10,
+      "reason": "Конкатенация идёт в параметр Criteria API cb.like, а не в текст SQL."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportEntity.kt",
+      "line": 21,
+      "reason": "Производный метод JpaRepository."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/org/ledgerline/reports/ReportEntity.kt",
+      "line": 24,
+      "reason": "@Query с :status и @Param."
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+.steel-register,
+.steel-library,
+.integration-registry {
+  border-block: 1px solid var(--border);
+  margin: 18px 0 20px;
+}
+.steel-register table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+}
+.steel-register th {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface);
+}
+.steel-register :is(td, th) {
+  padding: 13px 10px;
+}
+.steel-register tr + tr,
+.route-entry + .route-entry,
+.integration-row + .integration-row {
+  border-top: 1px solid var(--border);
+}
+.project-name,
+.route-entry,
+.route-meta,
+.integration-row,
+.quiet-action,
+.report-distribution {
+  display: flex;
+  align-items: center;
+}
+.project-name {
+  gap: 12px;
+}
+.project-name > svg,
+.route-entry > svg,
+.integration-symbol {
+  color: var(--text-muted);
+}
+.project-name h2,
+.route-main h2,
+.integration-registry h2,
+.report-distribution h2 {
+  font-size: 15px;
+  letter-spacing: -0.018em;
+  margin: 0;
+  font-weight: 600;
+}
+.project-name small,
+.integration-row p,
+.report-distribution p {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.project-name small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.critical-value {
+  color: #f6a39d;
+}
+.quiet-action {
+  gap: 5px;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  background: transparent;
+  padding: 7px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.quiet-action:hover,
+.risk-distribution-list button:hover {
+  background: var(--surface-2);
+}
+.route-entry,
+.integration-row {
+  gap: 18px;
+  padding: 19px 10px;
+  align-items: flex-start;
+}
+.route-main,
+.integration-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.route-meta {
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 6px 0 11px;
+  flex-wrap: wrap;
+}
+.route-main details,
+.evidence-list {
+  font-size: 13px;
+}
+.route-stages {
+  padding-left: 24px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+.route-main summary,
+.evidence-list summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.integration-row {
+  align-items: center;
+}
+.integration-row > small {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.report-distribution {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  border-block: 1px solid var(--border);
+  padding: 16px 0;
+  margin: 16px 0;
+}
+.risk-distribution-list {
+  flex: 1;
+  max-width: 650px;
+  display: grid;
+  gap: 2px;
+}
+.risk-distribution-list button {
+  display: grid;
+  grid-template-columns: 100px minmax(40px, 1fr) 25px;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 5px;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+.bar-track {
+  background: var(--surface-2);
+  height: 6px;
+}
+.bar-track i {
+  display: block;
+  height: 100%;
+}
+.bar-CRITICAL {
+  background: #e98382;
+}
+.bar-HIGH {
+  background: #dcab75;
+}
+.bar-MEDIUM {
+  background: #c1ac72;
+}
+.bar-LOW {
+  background: #88abc0;
+}
+.risk-distribution-list b {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.forensics .code-location {
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.evidence-list {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 920px) {
+  .steel-register :is(td, th) {
+    padding: 10px 6px;
+  }
+  .integration-row {
+    flex-wrap: wrap;
+  }
+  .integration-row > small {
+    max-width: 120px;
+  }
+}
+@media (max-width: 720px) {
+  .steel-register table,
+  .steel-register tbody,
+  .steel-register tr {
+    display: block;
+  }
+  .steel-register thead {
+    display: none;
+  }
+  .steel-register tr {
+    padding: 12px 0;
+  }
+  .steel-register td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 2px;
+  }
+  .steel-register td[data-label]:before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .steel-register td:first-child {
+    margin-bottom: 5px;
+  }
+  .steel-register td:last-child {
+    justify-content: flex-end;
+  }
+  .route-entry,
+  .integration-row {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 8px 10px;
+    padding: 15px 0;
+  }
+  .route-entry > .quiet-action,
+  .integration-row > .quiet-action,
+  .integration-row > small {
+    grid-column: 2;
+    justify-self: start;
+    max-width: none;
+  }
+  .report-distribution {
+    display: block;
+  }
+  .risk-distribution-list {
+    margin-top: 12px;
+  }
+}
+.report-archive {
+  margin: 0;
+  border: 0;
+}
+.report-archive td {
+  font-variant-numeric: tabular-nums;
+}
+.archive-title {
+  display: block;
+  font-weight: 550;
+}
+.archive-title:hover {
+  text-decoration: underline;
+}
+.report-archive td small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.evidence-list p {
+  margin-top: 10px;
+}
+@media (max-width: 720px) {
+  .report-archive td:first-child {
+    display: block;
+  }
+  .report-archive td:last-child {
+    justify-content: space-between;
+  }
+  .workspace .record-title .report-remedy {
+    display: none;
+  }
+}
+
+.report-details {
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.report-details .card {
+  border-radius: 6px;
+  padding: clamp(12px, 2vw, 20px);
+}
+.report-details .card__title {
+  color: var(--text);
+}
+.report-details .coverage-list li + li {
+  margin-top: 5px;
+}
+.report-details .finding__ai {
+  border-color: var(--border);
+}
+.report-details .table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.workspace .routes__row--risk td {
+  background: color-mix(in srgb, var(--surface) 87%, var(--warn));
+}
+.workspace .routes__row--risk td:first-child {
+  border-left: 2px solid var(--warn);
+}

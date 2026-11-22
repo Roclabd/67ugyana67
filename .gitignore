@@ -1,0 +1,36 @@
+# Секреты — никогда в репозиторий
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Gradle / Kotlin / JVM
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+.kotlin/
+
+# Node / фронт
+node_modules/
+frontend/dist/
+*.local
+
+# IDE и ОС
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Данные запусков платформы
+data/
+runs/
+*.mv.db
+*.trace.db
+
+# Сгенерированные вариации мутатора (эталонные для тестов — в fixtures/variants/keep/)
+fixtures/variants/*
+!fixtures/variants/keep/

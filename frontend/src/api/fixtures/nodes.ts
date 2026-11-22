@@ -1,0 +1,250 @@
+import { TELEGRAM_CHAT_LIST_MAX_LENGTH } from '../types'
+import type { NodeDefinition } from '../types'
+
+/**
+ * Каталог нод для режима моков. Форма — GET /api/nodes (docs/API.md, contracts/node-spi.md).
+ * Типы нод — рабочие названия; при расхождении с реестром бэка правим здесь.
+ */
+export const nodesFixture: NodeDefinition[] = [
+  {
+    type: 'trigger.manual',
+    title: 'Запуск по кнопке',
+    category: 'TRIGGER',
+    inputs: [],
+    outputs: [{ name: 'out', type: 'ANY', required: true }],
+    paramsSchema: { type: 'object', properties: {} },
+    secretParams: [],
+  },
+  {
+    type: 'trigger.cron',
+    title: 'По расписанию',
+    category: 'TRIGGER',
+    inputs: [],
+    outputs: [{ name: 'out', type: 'ANY', required: true }],
+    paramsSchema: {
+      type: 'object',
+      required: ['cron'],
+      properties: {
+        cron: { type: 'string', title: 'Cron-выражение', default: '0 0 14 * * *', description: 'сек мин час день месяц день_недели' },
+        timezone: { type: 'string', title: 'Часовой пояс', default: 'Europe/Moscow' },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'trigger.webhook',
+    title: 'Webhook / CI',
+    category: 'TRIGGER',
+    inputs: [],
+    outputs: [{ name: 'out', type: 'ANY', required: true }],
+    paramsSchema: {
+      type: 'object',
+      properties: { token: { type: 'string', title: 'Токен вызова', format: 'password' } },
+    },
+    secretParams: ['token'],
+  },
+  {
+    type: 'source.repo',
+    title: 'Клон учебного репозитория',
+    category: 'SOURCE',
+    inputs: [{ name: 'in', type: 'ANY', required: false }],
+    outputs: [{ name: 'workspace', type: 'WORKSPACE', required: true }],
+    paramsSchema: {
+      type: 'object',
+      required: ['url'],
+      properties: {
+        url: { type: 'string', title: 'Репозиторий', enum: ['https://github.com/example-org/training'] },
+        branch: { type: 'string', title: 'Ветка', default: 'main' },
+        subdir: { type: 'string', title: 'Папка проекта', default: 'sample-project' },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'source.archive',
+    title: 'Архив проекта',
+    category: 'SOURCE',
+    inputs: [{ name: 'in', type: 'ANY', required: false }],
+    outputs: [{ name: 'workspace', type: 'WORKSPACE', required: true }],
+    paramsSchema: { type: 'object', properties: { uploadId: { type: 'string', title: 'Загруженный архив' } } },
+    secretParams: [],
+  },
+  {
+    type: 'analyzer.parse',
+    title: 'Разбор проекта',
+    category: 'ANALYZER',
+    inputs: [{ name: 'workspace', type: 'WORKSPACE', required: true }],
+    outputs: [{ name: 'model', type: 'PROJECT_MODEL', required: true }],
+    paramsSchema: { type: 'object', properties: {} },
+    secretParams: [],
+  },
+  {
+    type: 'analyzer.secret',
+    title: 'Поиск секретов',
+    category: 'ANALYZER',
+    inputs: [{ name: 'model', type: 'PROJECT_MODEL', required: true }],
+    outputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    paramsSchema: {
+      type: 'object',
+      properties: {
+        minSeverity: { type: 'string', title: 'Минимальная критичность', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'LOW' },
+        includeTests: { type: 'boolean', title: 'Проверять тесты', default: true },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'analyzer.sca',
+    title: 'Уязвимые зависимости (SCA)',
+    category: 'ANALYZER',
+    inputs: [{ name: 'model', type: 'PROJECT_MODEL', required: true }],
+    outputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    paramsSchema: {
+      type: 'object',
+      properties: {
+        minSeverity: { type: 'string', title: 'Минимальная критичность', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'LOW' },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'analyzer.sast',
+    title: 'Анализ кода Kotlin/Spring (SAST)',
+    category: 'ANALYZER',
+    inputs: [{ name: 'model', type: 'PROJECT_MODEL', required: true }],
+    outputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    paramsSchema: {
+      type: 'object',
+      properties: {
+        minSeverity: { type: 'string', title: 'Минимальная критичность', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'LOW' },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'output.route-map',
+    title: 'Карта маршрутов',
+    category: 'OUTPUT',
+    inputs: [{ name: 'model', type: 'PROJECT_MODEL', required: true }],
+    outputs: [{ name: 'report', type: 'REPORT', required: true }],
+    paramsSchema: { type: 'object', properties: {} },
+    secretParams: [],
+  },
+  {
+    type: 'logic.merge',
+    title: 'Объединить находки',
+    category: 'LOGIC',
+    inputs: [
+      { name: 'a', type: 'FINDINGS', required: false },
+      { name: 'b', type: 'FINDINGS', required: false },
+      { name: 'c', type: 'FINDINGS', required: false },
+    ],
+    outputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    paramsSchema: { type: 'object', properties: { dedupe: { type: 'boolean', title: 'Убрать дубликаты', default: true } } },
+    secretParams: [],
+  },
+  {
+    type: 'logic.if',
+    title: 'Если / иначе',
+    category: 'LOGIC',
+    inputs: [{ name: 'in', type: 'ANY', required: true }],
+    outputs: [
+      { name: 'true', type: 'ANY', required: true },
+      { name: 'false', type: 'ANY', required: true },
+    ],
+    paramsSchema: {
+      type: 'object',
+      required: ['left', 'op', 'right'],
+      properties: {
+        left: { type: 'string', title: 'Значение', default: '{{findings.bySeverity.CRITICAL}}' },
+        op: { type: 'string', title: 'Сравнение', enum: ['>', '>=', '==', '!=', '<', '<=', 'matches'], default: '>' },
+        right: { type: 'string', title: 'С чем', default: '0' },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'ai.explain',
+    title: 'AI: объяснить и сгруппировать',
+    category: 'AI',
+    inputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    outputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    paramsSchema: {
+      type: 'object',
+      properties: {
+        language: { type: 'string', title: 'Язык', enum: ['ru', 'en'], default: 'ru' },
+        maxFindings: { type: 'integer', title: 'Не больше находок', minimum: 1, maximum: 200, default: 50 },
+      },
+    },
+    secretParams: [],
+  },
+  {
+    type: 'output.report',
+    title: 'Отчёт (JSON + читаемый)',
+    category: 'OUTPUT',
+    inputs: [{ name: 'findings', type: 'FINDINGS', required: true }],
+    outputs: [{ name: 'report', type: 'REPORT', required: true }],
+    paramsSchema: { type: 'object', properties: {} },
+    secretParams: [],
+  },
+  {
+    type: 'notify.telegram',
+    title: 'Telegram',
+    category: 'OUTPUT',
+    inputs: [{ name: 'report', type: 'REPORT', required: true }],
+    outputs: [],
+    paramsSchema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string', format: 'password' },
+        chatId: { type: 'string', maxLength: TELEGRAM_CHAT_LIST_MAX_LENGTH },
+        attachments: { type: 'array', items: { type: 'string', enum: ['pdf', 'md', 'html', 'json', 'sarif'] } },
+        format: { type: 'string', enum: ['pdf', 'md', 'html', 'json', 'sarif', 'none'] },
+        minSeverity: { type: 'string', enum: ['always', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'always' },
+        onlyNew: { type: 'boolean', default: false },
+        topN: { type: 'integer', enum: [3, 5, 10], default: 3 },
+        includeAi: { type: 'boolean', default: true },
+        includeIndex: { type: 'boolean', default: false },
+        silent: { type: 'boolean', default: false },
+        threadId: { type: 'integer', minimum: 1, maximum: 2147483647 },
+        language: { type: 'string', enum: ['ru', 'en'], default: 'ru' },
+      },
+    },
+    secretParams: ['token'],
+  },
+  {
+    type: 'notify.smtp',
+    title: 'Почта (SMTP)',
+    category: 'OUTPUT',
+    inputs: [{ name: 'report', type: 'REPORT', required: true }],
+    outputs: [],
+    paramsSchema: {
+      type: 'object',
+      required: ['host', 'to'],
+      properties: {
+        host: { type: 'string', title: 'SMTP-сервер' },
+        port: { type: 'integer', title: 'Порт', default: 587 },
+        username: { type: 'string', title: 'Логин' },
+        password: { type: 'string', title: 'Пароль', format: 'password' },
+        to: { type: 'string', title: 'Кому' },
+      },
+    },
+    secretParams: ['password'],
+  },
+  {
+    type: 'notify.webhook',
+    title: 'HTTP webhook',
+    category: 'OUTPUT',
+    inputs: [{ name: 'report', type: 'REPORT', required: true }],
+    outputs: [],
+    paramsSchema: {
+      type: 'object',
+      required: ['url'],
+      properties: {
+        url: { type: 'string', title: 'URL', format: 'uri' },
+        authHeader: { type: 'string', title: 'Заголовок Authorization', format: 'password' },
+      },
+    },
+    secretParams: ['authHeader'],
+  },
+]

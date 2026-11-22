@@ -1,0 +1,45 @@
+{
+  "findings": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 20,
+      "endLine": 21
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 24,
+      "endLine": 26
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 31,
+      "endLine": 32
+    }
+  ],
+  "controls": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 35,
+      "endLine": 36,
+      "reason": "Запрос с ?, vin передаётся JDBC отдельным аргументом."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 39,
+      "endLine": 40,
+      "reason": "Параметр типа Long: инъекция строкой невозможна."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/fleetdesk/search/VehicleSearchController.kt",
+      "line": 43,
+      "endLine": 45,
+      "reason": "NamedParameterJdbcTemplate с :make и MapSqlParameterSource."
+    }
+  ]
+}

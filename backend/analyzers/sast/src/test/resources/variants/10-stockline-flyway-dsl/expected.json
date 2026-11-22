@@ -1,0 +1,73 @@
+{
+  "findings": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/com/stockline/warehouse/config/WarehouseSecurity.kt",
+      "line": 17
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/com/stockline/warehouse/config/WebConfig.kt",
+      "line": 13
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockQueries.kt",
+      "line": 11,
+      "endLine": 12
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockQueries.kt",
+      "line": 14,
+      "endLine": 15
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockQueries.kt",
+      "line": 19,
+      "endLine": 20
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockController.kt",
+      "line": 38,
+      "endLine": 39
+    }
+  ],
+  "controls": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/com/stockline/warehouse/config/WarehouseSecurity.kt",
+      "line": 16,
+      "reason": "Kotlin DSL: публичный health, затеняющих правил ниже нет."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/com/stockline/warehouse/config/WebConfig.kt",
+      "line": 19,
+      "reason": "@CrossOrigin \"*\" без credentials."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockQueries.kt",
+      "line": 22,
+      "endLine": 23,
+      "reason": "JPQL с :name и setParameter."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockQueries.kt",
+      "line": 27,
+      "endLine": 31,
+      "reason": "Criteria API."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/com/stockline/warehouse/stock/StockController.kt",
+      "line": 42,
+      "endLine": 43,
+      "reason": "Authentication и сравнение ownerId с authentication.name."
+    }
+  ]
+}

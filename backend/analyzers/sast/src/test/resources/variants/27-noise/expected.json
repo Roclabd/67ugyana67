@@ -1,0 +1,87 @@
+{
+  "findings": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+      "line": 13,
+      "endLine": 14
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/lab/servicedesk/integration/SupplierHttpsClient.kt",
+      "line": 13
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairCors.kt",
+      "line": 13,
+      "endLine": 14
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "line": 19
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketReader.kt",
+      "line": 10,
+      "endLine": 11
+    }
+  ],
+  "controls": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+      "line": 17,
+      "endLine": 18,
+      "reason": "Запрос использует ?, значения передаются отдельно."
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "line": 17,
+      "reason": "Публичный каталог услуг без карточек клиентов и состояния заказов."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/lab/servicedesk/integration/ManualsHttpsClient.kt",
+      "line": 7,
+      "endLine": 8,
+      "reason": "Обычный HTTPS-клиент использует штатную проверку имени и цепочки."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairSpecSearchController.kt",
+      "line": 13,
+      "endLine": 15,
+      "reason": "Criteria/JPA Specification параметризует значение, конкатенации SQL нет."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/lab/servicedesk/integration/PartnerHttpsClient.kt",
+      "line": 12,
+      "reason": "HostnameVerifier сравнивает имя хоста с ожидаемым, проверка не отключена."
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairCors.kt",
+      "line": 17,
+      "endLine": 19,
+      "reason": "CORS \"*\" без allowCredentials на публичном каталоге."
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "line": 18,
+      "reason": "Публичный каталог без персональных данных."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketStatusController.kt",
+      "line": 14,
+      "endLine": 15,
+      "reason": "Principal и WHERE ticket_id = ? AND customer_id = ?."
+    }
+  ]
+}

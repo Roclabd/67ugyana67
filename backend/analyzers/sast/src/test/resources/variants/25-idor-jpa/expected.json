@@ -1,0 +1,61 @@
+{
+  "findings": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+      "line": 13,
+      "endLine": 14
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/lab/servicedesk/integration/SupplierHttpsClient.kt",
+      "line": 13
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairCors.kt",
+      "line": 13,
+      "endLine": 14
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "line": 18
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketReader.kt",
+      "line": 9,
+      "endLine": 10
+    }
+  ],
+  "controls": [
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+      "line": 17,
+      "endLine": 18,
+      "reason": "Запрос использует ?, значения передаются отдельно."
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "line": 17,
+      "reason": "Публичный каталог услуг без карточек клиентов и состояния заказов."
+    },
+    {
+      "class": "tls-verification",
+      "path": "src/main/kotlin/lab/servicedesk/integration/ManualsHttpsClient.kt",
+      "line": 7,
+      "endLine": 8,
+      "reason": "Обычный HTTPS-клиент использует штатную проверку имени и цепочки."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketController.kt",
+      "line": 21,
+      "endLine": 22,
+      "reason": "Principal и выборка по ticketId и customerId владельца."
+    }
+  ]
+}

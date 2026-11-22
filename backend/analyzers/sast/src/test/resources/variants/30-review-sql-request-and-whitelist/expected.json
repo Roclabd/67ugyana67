@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "sql-injection", "path": "src/main/kotlin/lab/variants/stock/StockController.kt", "line": 13, "endLine": 16}
+  ],
+  "controls": [
+    {"class": "sql-injection", "path": "src/main/kotlin/lab/variants/stock/StockController.kt", "line": 22, "endLine": 25, "reason": "require разрешает только два фиксированных SQL-идентификатора sku и price; произвольный SQL не достигает JdbcTemplate."}
+  ]
+}

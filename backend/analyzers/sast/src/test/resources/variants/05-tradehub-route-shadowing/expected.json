@@ -1,0 +1,28 @@
+{
+  "findings": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/kz/tradehub/access/TradeSecurity.kt",
+      "line": 21
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/kz/tradehub/access/TradeSecurity.kt",
+      "line": 34
+    }
+  ],
+  "controls": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/kz/tradehub/access/TradeSecurity.kt",
+      "line": 19,
+      "reason": "Публичный health, более строгого правила для пути ниже нет."
+    },
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/kz/tradehub/access/TradeSecurity.kt",
+      "line": 20,
+      "reason": "Публичный каталог, пути не пересекаются со строгими правилами ниже."
+    }
+  ]
+}

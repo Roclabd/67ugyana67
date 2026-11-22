@@ -1,0 +1,17 @@
+server:
+  address: 127.0.0.1
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:servicedesk;DB_CLOSE_DELAY=-1
+  sql:
+    init:
+      mode: always
+
+pickup:
+  callback:
+    authorization: "Bearer codeguard_pickup_Gq7mP8vJdW3sY6zN"
+
+inventory:
+  integration:
+    token: ${INVENTORY_TOKEN}

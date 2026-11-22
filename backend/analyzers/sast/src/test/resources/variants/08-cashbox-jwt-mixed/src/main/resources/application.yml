@@ -1,0 +1,11 @@
+cashbox:
+  jwt:
+    secret: ${CASHBOX_JWT_SECRET}
+    ttl-minutes: 30
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:cashbox;DB_CLOSE_DELAY=-1
+  sql:
+    init:
+      mode: always

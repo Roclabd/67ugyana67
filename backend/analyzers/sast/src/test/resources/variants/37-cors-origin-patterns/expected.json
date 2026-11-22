@@ -1,0 +1,9 @@
+{
+  "findings": [
+    {"class": "credentialed-cors", "path": "src/main/kotlin/lab/variants/config/PatternCors.kt", "line": 11, "endLine": 12}
+  ],
+  "controls": [
+    {"class": "credentialed-cors", "path": "src/main/kotlin/lab/variants/config/PatternCors.kt", "line": 15, "endLine": 16, "reason": "Точный доверенный origin."},
+    {"class": "credentialed-cors", "path": "src/main/kotlin/lab/variants/config/PatternCors.kt", "line": 19, "endLine": 20, "reason": "Подстановка только в порту localhost."}
+  ]
+}

@@ -1,0 +1,15 @@
+# По умолчанию — нормализация концов строк
+* text=auto eol=lf
+
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+gradlew text eol=lf
+*.jar binary
+*.pdf binary
+*.png binary
+*.jpg binary
+
+# Учебный набор авторов набора и вариации храним байт в байт (последнее правило — оно главнее):
+# анализаторы и evaluator считают номера строк, CRLF/BOM не должны меняться при checkout
+fixtures/** -text

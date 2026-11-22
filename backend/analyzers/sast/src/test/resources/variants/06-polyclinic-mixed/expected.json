@@ -1,0 +1,49 @@
+{
+  "findings": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/polyclinic/config/PortalSecurity.kt",
+      "line": 20
+    },
+    {
+      "class": "credentialed-cors",
+      "path": "src/main/kotlin/ru/polyclinic/config/PortalSecurity.kt",
+      "line": 28,
+      "endLine": 30
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/polyclinic/visit/VisitController.kt",
+      "line": 23,
+      "endLine": 24
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/polyclinic/visit/VisitController.kt",
+      "line": 35,
+      "endLine": 36
+    }
+  ],
+  "controls": [
+    {
+      "class": "route-authorization",
+      "path": "src/main/kotlin/ru/polyclinic/config/PortalSecurity.kt",
+      "line": 19,
+      "reason": "Публичный справочник врачей без owner-колонок."
+    },
+    {
+      "class": "object-authorization",
+      "path": "src/main/kotlin/ru/polyclinic/visit/VisitController.kt",
+      "line": 27,
+      "endLine": 29,
+      "reason": "Principal и WHERE visit_id = ? AND patient_id = ?."
+    },
+    {
+      "class": "sql-injection",
+      "path": "src/main/kotlin/ru/polyclinic/visit/VisitController.kt",
+      "line": 39,
+      "endLine": 40,
+      "reason": "Запрос с ?, значения передаются отдельно."
+    }
+  ]
+}

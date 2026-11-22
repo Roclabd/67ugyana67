@@ -1,0 +1,658 @@
+{
+  "runId": "run-0001",
+  "workflowId": "wf-full",
+  "workflowVersion": 3,
+  "inputHash": "b6d01f5f61693a02cef0de582900be769594501fad982dcb8b6c9efe5585c284",
+  "rulesVersion": "2026.11.20-1",
+  "coverage": {
+    "status": "COMPLETE",
+    "byAnalyzer": {
+      "n4": {
+        "status": "COMPLETE",
+        "filesAnalyzed": 21,
+        "filesSkipped": [],
+        "rulesApplied": [
+          "secret.config.token",
+          "secret.const-fold.token",
+          "secret.fallback.literal",
+          "secret.literal.api-key",
+          "secret.literal.password"
+        ],
+        "unresolved": [],
+        "dismissed": [
+          {
+            "rule": "secret.literal.api-key",
+            "path": "README.md",
+            "line": 9,
+            "reason": "Плейсхолдер в документации (YOUR_API_KEY)"
+          },
+          {
+            "rule": "secret.config.token",
+            "path": "src/main/resources/application.yml",
+            "line": 17,
+            "reason": "Подстановка из окружения ${INVENTORY_TOKEN} без значения по умолчанию"
+          },
+          {
+            "rule": "secret.fallback.literal",
+            "path": "src/main/kotlin/lab/servicedesk/config/RepairAccounts.kt",
+            "line": 17,
+            "reason": "Fallback — случайное значение UUID, не литерал"
+          },
+          {
+            "rule": "secret.config.token",
+            "path": "src/main/kotlin/lab/servicedesk/pickup/LegacyIntake.kt",
+            "line": 31,
+            "reason": "@Value без значения по умолчанию"
+          }
+        ]
+      },
+      "n5": {
+        "status": "COMPLETE",
+        "filesAnalyzed": 3,
+        "filesSkipped": [],
+        "rulesApplied": [
+          "sca.vulnerable-version-range"
+        ],
+        "unresolved": [],
+        "dismissed": [
+          {
+            "rule": "sca.vulnerable-version-range",
+            "path": "build.gradle.kts",
+            "line": 39,
+            "reason": "commons-lang3 3.20.0 вне уязвимого диапазона CVE-2025-48924"
+          },
+          {
+            "rule": "sca.scope.declared-only",
+            "path": "gradle.lockfile",
+            "reason": "snakeyaml 2.5 и kotlin-stdlib 2.2.21 — транзитивные, вне области"
+          }
+        ]
+      },
+      "n6": {
+        "status": "COMPLETE",
+        "filesAnalyzed": 17,
+        "filesSkipped": [],
+        "rulesApplied": [
+          "sast.cors.wildcard-with-credentials",
+          "sast.idor.missing-owner-filter",
+          "sast.route.shadowed-permit-all",
+          "sast.sql.taint-to-jdbc",
+          "sast.tls.hostname-verifier-true"
+        ],
+        "unresolved": [],
+        "dismissed": [
+          {
+            "rule": "sast.sql.taint-to-jdbc",
+            "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+            "line": 17,
+            "reason": "Параметризованный запрос: ? и отдельный аргумент JDBC"
+          },
+          {
+            "rule": "sast.route.shadowed-permit-all",
+            "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+            "line": 17,
+            "reason": "permitAll на публичный каталог услуг, строгого правила не затеняет"
+          },
+          {
+            "rule": "sast.tls.hostname-verifier-true",
+            "path": "src/main/kotlin/lab/servicedesk/integration/ManualsHttpsClient.kt",
+            "line": 7,
+            "reason": "Стандартная проверка TLS"
+          }
+        ]
+      }
+    }
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "fingerprint": "c793b7c1c53b713759c99f537fd361791fee278728e69db2ec2ec5215a783ed1",
+      "category": "SECRET",
+      "path": "src/main/kotlin/lab/servicedesk/integration/PartsImportSettings.kt",
+      "severity": "HIGH",
+      "description": "`integration/PartsImportSettings.kt`, `legacyImportPassword` содержит пароль служебной учётной записи импорта.",
+      "remediation": "Читать из окружения или хранилища секретов без литерала по умолчанию.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/integration/PartsImportSettings.kt",
+          "line": 4,
+          "note": "литерал секрета (значение замаскировано)"
+        }
+      ],
+      "class": "password",
+      "line": 4,
+      "rule": "secret.literal.password",
+      "title": "Пароль в коде",
+      "secretMasked": "codeguard_••••••••",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: integration/PartsImportSettings.kt, legacyImportPassword содержит пароль служебной учётной записи импорта.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Читать из окружения или хранилища секретов без литерала по умолчанию."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-02",
+      "fingerprint": "6c7a0e4454c50c8541af19ae34945010da5bb79aaa3f5c5f9359ece78653bc8f",
+      "category": "SECRET",
+      "path": "src/main/kotlin/lab/servicedesk/integration/QuoteRequest.kt",
+      "severity": "MEDIUM",
+      "description": "`integration/QuoteRequest.kt`, строковый `pricingApiKey` напрямую помещается в заголовок `X-Api-Key` запроса чтения прайса.",
+      "remediation": "Внедрять ключ через настройки и маскировать при журналировании.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/integration/QuoteRequest.kt",
+          "line": 7,
+          "note": "литерал секрета (значение замаскировано)"
+        }
+      ],
+      "class": "api-key",
+      "line": 7,
+      "rule": "secret.literal.api-key",
+      "title": "API-ключ в коде",
+      "secretMasked": "codeguard_••••••••",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: integration/QuoteRequest.kt, строковый pricingApiKey напрямую помещается в заголовок X-Api-Key запроса чтения прайса.",
+        "impact": "Повышает риск компрометации при сочетании с другими уязвимостями.",
+        "fixSteps": [
+          "Внедрять ключ через настройки и маскировать при журналировании."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-03",
+      "fingerprint": "29fa950a508767544dea3dff6715504c144a3974d3c41a285311d9556efb5b1a",
+      "category": "SECRET",
+      "path": "src/main/resources/application.yml",
+      "severity": "HIGH",
+      "description": "`src/main/resources/application.yml`, `pickup.callback.authorization` хранит строку `Bearer …`. Адаптер использует её для подтверждения выдачи.",
+      "remediation": "Задать свойство через `${PICKUP_CALLBACK_TOKEN}` без встроенного значения и собирать заголовок на границе адаптера.",
+      "evidence": [
+        {
+          "path": "src/main/resources/application.yml",
+          "line": 13,
+          "note": "литерал секрета (значение замаскировано)"
+        }
+      ],
+      "class": "configuration-token",
+      "line": 13,
+      "rule": "secret.config.token",
+      "title": "Токен в конфигурации",
+      "secretMasked": "Bearer ••••••••",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: src/main/resources/application.yml, pickup.callback.authorization хранит строку Bearer …. Адаптер использует её для подтверждения выдачи.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Задать свойство через ${PICKUP_CALLBACK_TOKEN} без встроенного значения и собирать заголовок на границе адаптера."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-04",
+      "fingerprint": "354fb9736236360869480f9b92aa30fb29b39d42f22d96108516bfaa990e97e9",
+      "category": "SECRET",
+      "path": "src/main/kotlin/lab/servicedesk/integration/DepotStatusClient.kt",
+      "severity": "LOW",
+      "description": "`integration/DepotStatusClient.kt`, `System.getenv(\"DEPOT_STATUS_TOKEN\") ?: \"…\"` задаёт встроенный токен чтения статуса.",
+      "remediation": "Удалить fallback. При отсутствии переменной отключать интеграцию.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/integration/DepotStatusClient.kt",
+          "line": 8,
+          "note": "литерал секрета (значение замаскировано)"
+        }
+      ],
+      "class": "secret-fallback",
+      "line": 8,
+      "rule": "secret.fallback.literal",
+      "title": "Секрет как значение по умолчанию",
+      "secretMasked": "codeguard_••••••••",
+      "ai": {
+        "status": "NOT_RECEIVED"
+      }
+    },
+    {
+      "id": "f-05",
+      "fingerprint": "60d49b0214271b4cd33af39cc447327e12199020a45247c61f0942310eadc779",
+      "category": "SECRET",
+      "path": "src/main/kotlin/lab/servicedesk/integration/WarrantyHeaders.kt",
+      "severity": "MEDIUM",
+      "description": "`integration/WarrantyHeaders.kt`, два фрагмента из локальных `val` соединяются через `+` перед установкой `Authorization` для портала гарантий.",
+      "remediation": "Подставлять цельный токен из окружения или хранилища секретов.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/integration/WarrantyHeaders.kt",
+          "line": 7,
+          "endLine": 10,
+          "note": "литерал секрета (значение замаскировано)"
+        }
+      ],
+      "class": "recoverable-token",
+      "line": 7,
+      "endLine": 10,
+      "rule": "secret.const-fold.token",
+      "title": "Токен, склеенный из частей",
+      "secretMasked": "codeguard_••••••••",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: integration/WarrantyHeaders.kt, два фрагмента из локальных val соединяются через + перед установкой Authorization для портала гарантий.",
+        "impact": "Повышает риск компрометации при сочетании с другими уязвимостями.",
+        "fixSteps": [
+          "Подставлять цельный токен из окружения или хранилища секретов."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-06",
+      "fingerprint": "5f99e9aab8af696a9a4059f3df874cfa1ceea691e8576dbba659334ee154ad52",
+      "category": "SCA",
+      "path": "build.gradle.kts",
+      "severity": "CRITICAL",
+      "description": "Библиотека рендеринга старых шаблонов. CVE относится к опасным lookup-подстановкам при интерполяции недоверенного текста. Прочитать прямой литерал `implementation(\"group:artifact:version\")` и сравнить числовые компоненты версии с диапазоном.",
+      "remediation": "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: `[1.5, 1.10.0)` → `1.10.0`",
+      "evidence": [
+        {
+          "path": "build.gradle.kts",
+          "line": 31,
+          "note": "org.apache.commons:commons-text:1.9 — объявление зависимости"
+        }
+      ],
+      "rule": "sca.vulnerable-version-range",
+      "title": "org.apache.commons:commons-text 1.9 — CVE-2022-42889",
+      "line": 31,
+      "group": "org.apache.commons",
+      "artifact": "commons-text",
+      "version": "1.9",
+      "advisoryId": "CVE-2022-42889",
+      "fixedVersions": [
+        "1.10.0"
+      ],
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: Библиотека рендеринга старых шаблонов. CVE относится к опасным lookup-подстановкам при интерполяции недоверенного текста. Прочитать прямой литерал implementation(\"group:artifact:version\") и сравнить числовые компоненты версии с диапазоном.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: [1.5, 1.10.0) → 1.10.0"
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-07",
+      "fingerprint": "8a8dd4988793e926683e5f18c6bc25fb85543c020f6e1bfa3d72863d95cd6c2a",
+      "category": "SCA",
+      "path": "build.gradle.kts",
+      "severity": "HIGH",
+      "description": "HTML-парсер квитанций. Обработка недоверенного документа может вызвать отказ в обслуживании. Извлечь вторую прямую зависимость, сопоставить координаты и проверить исключённую верхнюю границу.",
+      "remediation": "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: `(−∞, 1.14.2)` → `1.14.2`",
+      "evidence": [
+        {
+          "path": "build.gradle.kts",
+          "line": 32,
+          "note": "org.jsoup:jsoup:1.14.1 — объявление зависимости"
+        }
+      ],
+      "rule": "sca.vulnerable-version-range",
+      "title": "org.jsoup:jsoup 1.14.1 — CVE-2021-37714",
+      "line": 32,
+      "group": "org.jsoup",
+      "artifact": "jsoup",
+      "version": "1.14.1",
+      "advisoryId": "CVE-2021-37714",
+      "fixedVersions": [
+        "1.14.2"
+      ],
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: HTML-парсер квитанций. Обработка недоверенного документа может вызвать отказ в обслуживании. Извлечь вторую прямую зависимость, сопоставить координаты и проверить исключённую верхнюю границу.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: (−∞, 1.14.2) → 1.14.2"
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": false
+        }
+      }
+    },
+    {
+      "id": "f-08",
+      "fingerprint": "3878a31968cae3706355ae5ce2b96174cd251c7d931dd6cfb68a184939013130",
+      "category": "SCA",
+      "path": "build.gradle.kts",
+      "severity": "MEDIUM",
+      "description": "Импорт старых DUMP-архивов может зациклиться на повреждённом входе. Разрешить одну локальную строковую константу версии, подставленную в литерал координат.",
+      "remediation": "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: `[1.3, 1.26.0)` → `1.26.0`",
+      "evidence": [
+        {
+          "path": "build.gradle.kts",
+          "line": 33,
+          "note": "org.apache.commons:commons-compress:1.25.0 — объявление зависимости"
+        },
+        {
+          "path": "build.gradle.kts",
+          "line": 21,
+          "note": "связанное место"
+        }
+      ],
+      "rule": "sca.vulnerable-version-range",
+      "title": "org.apache.commons:commons-compress 1.25.0 — CVE-2024-25710",
+      "line": 33,
+      "group": "org.apache.commons",
+      "artifact": "commons-compress",
+      "version": "1.25.0",
+      "advisoryId": "CVE-2024-25710",
+      "fixedVersions": [
+        "1.26.0"
+      ],
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: Импорт старых DUMP-архивов может зациклиться на повреждённом входе. Разрешить одну локальную строковую константу версии, подставленную в литерал координат.",
+        "impact": "Повышает риск компрометации при сочетании с другими уязвимостями.",
+        "fixSteps": [
+          "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: [1.3, 1.26.0) → 1.26.0"
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-09",
+      "fingerprint": "ab43cd8184bfaff06f5fbfa43b9b267e9dc0dd4d79bd07224d2ed8b923155444",
+      "category": "SCA",
+      "path": "build.gradle.kts",
+      "severity": "MEDIUM",
+      "description": "FTP-клиент архивного обмена доверяет хосту из ответа PASV вредоносного сервера. Прочитать многострочный `add(\"implementation\", \"commons-net:commons-net:3.8.0\")` и исключить похожие строки вне блока зависимостей.",
+      "remediation": "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: `(−∞, 3.9.0)` → `3.9.0`",
+      "evidence": [
+        {
+          "path": "build.gradle.kts",
+          "line": 36,
+          "note": "commons-net:commons-net:3.8.0 — объявление зависимости"
+        }
+      ],
+      "rule": "sca.vulnerable-version-range",
+      "title": "commons-net:commons-net 3.8.0 — CVE-2021-37533",
+      "line": 36,
+      "group": "commons-net",
+      "artifact": "commons-net",
+      "version": "3.8.0",
+      "advisoryId": "CVE-2021-37533",
+      "fixedVersions": [
+        "3.9.0"
+      ],
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: FTP-клиент архивного обмена доверяет хосту из ответа PASV вредоносного сервера. Прочитать многострочный add(\"implementation\", \"commons-net:commons-net:3.8.0\") и исключить похожие строки вне блока зависимостей.",
+        "impact": "Повышает риск компрометации при сочетании с другими уязвимостями.",
+        "fixSteps": [
+          "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: (−∞, 3.9.0) → 3.9.0"
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-10",
+      "fingerprint": "757c5886a5959378a1e1cef754a454b82ad33cd64547ba108b59a79b0f725ec4",
+      "category": "SCA",
+      "path": "build.gradle.kts",
+      "severity": "HIGH",
+      "description": "JSON-парсер манифестов может исчерпать память на вложенных составных ключах. Сопоставить фиксированное `providers.gradleProperty(\"legacyManifestJsonVersion\").get()` со значением в `gradle.properties`, затем сравнить цельную числовую версию с включённой границей.",
+      "remediation": "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: `(−∞, 20230618]` → `20231013`",
+      "evidence": [
+        {
+          "path": "build.gradle.kts",
+          "line": 38,
+          "note": "org.json:json:20230227 — объявление зависимости"
+        },
+        {
+          "path": "gradle.properties",
+          "line": 1,
+          "note": "связанное место"
+        }
+      ],
+      "rule": "sca.vulnerable-version-range",
+      "title": "org.json:json 20230227 — CVE-2023-5072",
+      "line": 38,
+      "group": "org.json",
+      "artifact": "json",
+      "version": "20230227",
+      "advisoryId": "CVE-2023-5072",
+      "fixedVersions": [
+        "20231013"
+      ],
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: JSON-парсер манифестов может исчерпать память на вложенных составных ключах. Сопоставить фиксированное providers.gradleProperty(\"legacyManifestJsonVersion\").get() со значением в gradle.properties, затем сравнить цельную числовую версию с включённой границей.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Обновить до поддерживаемого исправленного релиза. Опубликованные границы и фиксы: (−∞, 20230618] → 20231013"
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-11",
+      "fingerprint": "de56f29a8b3253a927b211e7f86345ec40b2ccacf7fd83c28bf06e94c8216f54",
+      "category": "SAST",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+      "severity": "HIGH",
+      "description": "`repair/RepairLookupController.kt`, `findByFrameTag`. Строковый `@RequestParam frameTag` вставляется в SQL-шаблон, который передаётся `JdbcTemplate.queryForList`.",
+      "remediation": "Использовать `?` и передать `frameTag` отдельным параметром.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/repair/RepairLookupController.kt",
+          "line": 13,
+          "endLine": 14,
+          "note": "проблемное выражение"
+        }
+      ],
+      "class": "sql-injection",
+      "line": 13,
+      "endLine": 14,
+      "rule": "sast.sql.taint-to-jdbc",
+      "title": "SQL-инъекция",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: repair/RepairLookupController.kt, findByFrameTag. Строковый @RequestParam frameTag вставляется в SQL-шаблон, который передаётся JdbcTemplate.queryForList.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Использовать ? и передать frameTag отдельным параметром."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-12",
+      "fingerprint": "25967b2905d27bf917c04cf2ca2613fc1a866c2ceeff7819042465dd25fba001",
+      "category": "SAST",
+      "path": "src/main/kotlin/lab/servicedesk/integration/SupplierHttpsClient.kt",
+      "severity": "MEDIUM",
+      "description": "`integration/SupplierHttpsClient.kt`, `newConnection`. `HttpsURLConnection` получает `HostnameVerifier { _, _ -> true }` перед запросом за данными поставщика. Доверие к цепочке сертификатов сохраняется, а проверка имени хоста отключена.",
+      "remediation": "Использовать штатный `HostnameVerifier` и корректный сертификат для имени хоста.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/integration/SupplierHttpsClient.kt",
+          "line": 13,
+          "note": "проблемное выражение"
+        }
+      ],
+      "class": "tls-verification",
+      "line": 13,
+      "rule": "sast.tls.hostname-verifier-true",
+      "title": "Отключена проверка имени хоста TLS",
+      "ai": {
+        "status": "REJECTED_BY_VALIDATOR"
+      }
+    },
+    {
+      "id": "f-13",
+      "fingerprint": "875cbd8c6d2c33c08372c7a4b2d52cdb7031e2145a936b31331890a0f83e86f2",
+      "category": "SAST",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairCors.kt",
+      "severity": "MEDIUM",
+      "description": "`config/RepairCors.kt`, `corsConfigurationSource`. `allowedOriginPatterns = listOf(\"*\")` и `allowCredentials = true` действуют на приватном `GET /api/customer/summary`. Контроллер под `/api/customer` возвращает данные сессии. Для наблюдаемого эффекта браузер должен приложить cookie, например при запросе с недоверенного соседнего origin того же сайта.",
+      "remediation": "Разрешить только origin доверенного клиентского интерфейса или убрать credentialed CORS для маршрута.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/config/RepairCors.kt",
+          "line": 13,
+          "endLine": 14,
+          "note": "проблемное выражение"
+        }
+      ],
+      "class": "credentialed-cors",
+      "line": 13,
+      "endLine": 14,
+      "rule": "sast.cors.wildcard-with-credentials",
+      "title": "CORS: любой origin вместе с credentials",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: config/RepairCors.kt, corsConfigurationSource. allowedOriginPatterns = listOf(\"*\") и allowCredentials = true действуют на приватном GET /api/customer/summary. Контроллер под /api/customer возвращает данные сессии. Для наблюдаемого эффекта браузер должен приложить cookie, например при запросе с недоверенного соседнего origin того же сайта.",
+        "impact": "Повышает риск компрометации при сочетании с другими уязвимостями.",
+        "fixSteps": [
+          "Разрешить только origin доверенного клиентского интерфейса или убрать credentialed CORS для маршрута."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-14",
+      "fingerprint": "8eb6f3004213119219bf44f5e3578c040ec0805874501b32aa6343a34c32dbb8",
+      "category": "SAST",
+      "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+      "severity": "HIGH",
+      "description": "`config/RepairSecurity.kt`, `securityFilterChain`. Явный `permitAll()` на `GET /api/pickup/export` открывает список выдачи. `pickup/PickupExportController.kt` возвращает чужие записи без отдельной проверки роли.",
+      "remediation": "Требовать `hasRole(\"MECHANIC\")` и проверить доступ для гостя, клиента и мастера.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/config/RepairSecurity.kt",
+          "line": 18,
+          "note": "проблемное выражение"
+        },
+        {
+          "path": "src/main/kotlin/lab/servicedesk/pickup/PickupExportController.kt",
+          "line": 10,
+          "note": "связанное место"
+        }
+      ],
+      "class": "route-authorization",
+      "line": 18,
+      "rule": "sast.route.shadowed-permit-all",
+      "title": "Маршрут открыт раньше строгого правила",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: config/RepairSecurity.kt, securityFilterChain. Явный permitAll() на GET /api/pickup/export открывает список выдачи. pickup/PickupExportController.kt возвращает чужие записи без отдельной проверки роли.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Требовать hasRole(\"MECHANIC\") и проверить доступ для гостя, клиента и мастера."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    },
+    {
+      "id": "f-15",
+      "fingerprint": "224ea2d61ddf28cefb8c7df1d2e179c05907593bcbd41f715ac18e8276255e86",
+      "category": "SAST",
+      "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketReader.kt",
+      "severity": "HIGH",
+      "description": "`repair/RepairTicketController.kt`, `getTicket`, и `repair/RepairTicketReader.kt`, `read`. `GET /api/customer/tickets/{ticketId}` требует входа, но читает запись по одному переданному ID. В записи есть `customerId`, доступ ограничен владельцем по политике, фильтр владельца отсутствует.",
+      "remediation": "Выбирать заказ по `ticketId` и идентификатору из `Principal`. Чужой и отсутствующий заказ возвращают одинаковый ответ.",
+      "evidence": [
+        {
+          "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketReader.kt",
+          "line": 10,
+          "endLine": 11,
+          "note": "проблемное выражение"
+        },
+        {
+          "path": "src/main/kotlin/lab/servicedesk/repair/RepairTicketController.kt",
+          "line": 14,
+          "note": "связанное место"
+        }
+      ],
+      "class": "object-authorization",
+      "line": 10,
+      "endLine": 11,
+      "rule": "sast.idor.missing-owner-filter",
+      "title": "Чтение чужого объекта по id (IDOR)",
+      "ai": {
+        "status": "OK",
+        "explanation": "Простыми словами: repair/RepairTicketController.kt, getTicket, и repair/RepairTicketReader.kt, read. GET /api/customer/tickets/{ticketId} требует входа, но читает запись по одному переданному ID. В записи есть customerId, доступ ограничен владельцем по политике, фильтр владельца отсутствует.",
+        "impact": "Злоумышленник может получить доступ к данным клиентов.",
+        "fixSteps": [
+          "Выбирать заказ по ticketId и идентификатору из Principal. Чужой и отсутствующий заказ возвращают одинаковый ответ."
+        ],
+        "usefulnessChecks": {
+          "parsesAsKotlin": true,
+          "sameIdentifier": true,
+          "fixPattern": true
+        }
+      }
+    }
+  ],
+  "ai": {
+    "status": "PARTIAL",
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
+    "summary": "Главные риски: открытый экспорт выдачи и чтение чужих заявок (одна история доступа), SQL-инъекция в поиске по метке, критичная commons-text 1.9. Начать с обновления commons-text и закрытия /api/pickup/export.",
+    "validator": {
+      "responses": 15,
+      "schemaFailures": 1,
+      "rejectedFindingRefs": 1,
+      "rejectedCves": 2
+    }
+  }
+}

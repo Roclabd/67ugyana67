@@ -1,0 +1,8 @@
+{
+  "findings": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/repair/TicketLookup.kt", "line": 28, "endLine": 30}
+  ],
+  "controls": [
+    {"class": "object-authorization", "path": "src/main/kotlin/lab/variants/repair/TicketLookup.kt", "line": 35, "endLine": 39, "reason": "Оба условия связаны AND, а customer_id берётся из authentication.name серверной Spring Security сессии, а не из параметра запроса."}
+  ]
+}
